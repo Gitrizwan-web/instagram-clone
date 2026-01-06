@@ -1,0 +1,104 @@
+import { Route, Routes } from "react-router-dom";
+import { useEffect, useRef } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { io } from "socket.io-client";
+
+import Home from "./components/Home";
+import InstaLogin from "./components/Login";
+import InstaSignup from "./components/Signup";
+import Mainlayout from "./components/Mainlayout";
+import Profile from "./components/Profile";
+import EditProfile from "./components/EditProfile";
+import Chatpage from "./components/Chatpage";
+
+import { setonlineUsers } from "./Redux/Chatslice";
+import { setlikeNotification } from "./Redux/rtnslice";
+
+import Explorer from "./components/Explorer";
+import ProtectedRoute from "./components/ProtectedRoute";
+
+const App = () => {
+  const { user } = useSelector((store) => store.auth);
+  const dispatch = useDispatch();
+  const socketRef = useRef(null);
+
+  useEffect(() => {
+    if (!user?._id) return;
+
+    // Hardcoded Socket URL to avoid `process is not defined` error
+    const socketUrl = "http://localhost:3000";
+
+    socketRef.current = io(socketUrl, {
+      query: { userId: user._id },
+      transports: ["websocket"],
+    });
+
+    socketRef.current.on("getonlineUsers", (users) => {
+      dispatch(setonlineUsers(users || []));
+    });
+
+    socketRef.current.on("notification", (data) => {
+      if (data) {
+        dispatch(setlikeNotification(data));
+      }
+    });
+
+    return () => {
+      socketRef.current?.disconnect();
+      socketRef.current = null;
+    };
+  }, [user?._id, dispatch]);
+
+  return (
+    <Routes>
+      <Route element={<Mainlayout />}>
+        <Route
+          path="/"
+          element={
+            <ProtectedRoute>
+              <Home />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/profile/:id"
+          element={
+            <ProtectedRoute>
+              <Profile />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/profile/edit"
+          element={
+            <ProtectedRoute>
+              <EditProfile />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/chat"
+          element={
+            <ProtectedRoute>
+              <Chatpage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/explore"
+          element={
+            <ProtectedRoute>
+              <Explorer />
+            </ProtectedRoute>
+          }
+        />
+      </Route>
+
+      {/* Public routes */}
+      <Route path="/login" element={<InstaLogin />} />
+      <Route path="/signup" element={<InstaSignup />} />
+    </Routes>
+  );
+};
+
+export default App;
