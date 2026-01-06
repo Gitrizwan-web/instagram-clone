@@ -4,8 +4,8 @@
   "type": "module",
 "scripts": {
   "dev": "nodemon server.js", 
-  "build":"npm  install"// for local development
-  "start": "node server.js"       // for production / deployment
+  "build":"npm  install"
+  "start": "node server.js"      
 },
 
   "dependencies": {
