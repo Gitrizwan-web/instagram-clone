@@ -9,9 +9,6 @@
     "start": "node backend/index.js",
     "heroku-postbuild": "echo 'skip build'"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
   "dependencies": {
     "bcryptjs": "^2.4.3",
     "cloudinary": "^2.3.1",
