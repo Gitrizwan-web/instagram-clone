@@ -1,16 +1,18 @@
 {
-  "name": "instaclone",
+  "name": "backend",
   "version": "1.0.0",
-  "description": "Instagram Clone",
-  "main": "backend/server.js",
+  "description": "",
+  "main": "server.js",
   "type": "module",
-  "engines": {
-    "node": "18.x"
-  },
   "scripts": {
-    "start": "node backend/server.js",
-    "dev": "nodemon backend/server.js"
+    "dev": "nodemon backend/server.js",
+    "build":"npm install && npm install --prefix frontend && npm run build --prefix frontend ",
+    "start":"node backend/server.js"
+
   },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
   "dependencies": {
     "bcryptjs": "^3.0.3",
     "cloudinary": "^2.8.0",
@@ -22,10 +24,8 @@
     "jsonwebtoken": "^9.0.2",
     "mongoose": "^8.19.3",
     "multer": "^2.0.2",
+    "nodemon": "^3.1.10",
     "sharp": "^0.34.5",
     "socket.io": "^4.8.3"
-  },
-  "devDependencies": {
-    "nodemon": "^3.1.10"
   }
 }
