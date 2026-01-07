@@ -2,13 +2,20 @@
   "name": "backend",
   "version": "1.0.0",
   "description": "",
-  "main": "backend/index.js",
+  "main": "index.js",
   "type": "module",
+  "engines": {
+    "node": "18.x",
+    "npm": "9.x"
+  },
   "scripts": {
     "dev": "nodemon backend/index.js",
     "start": "node backend/index.js",
-    "heroku-postbuild": "echo 'skip build'"
+    "heroku-postbuild": "npm install --prefix frontend && npm run build --prefix frontend"
   },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
   "dependencies": {
     "bcryptjs": "^2.4.3",
     "cloudinary": "^2.3.1",
@@ -25,8 +32,5 @@
   },
   "devDependencies": {
     "nodemon": "^3.1.4"
-  },
-  "engines": {
-    "node": ">=18"
   }
 }
