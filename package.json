@@ -4,9 +4,8 @@
   "type": "module",
   "main": "backend/server.js",
   "scripts": {
-     "dev": "nodemon backend/server.js",
-       "build":"npm install",
-    "start": "node backend/server.js"
+    "start": "node backend/server.js",
+    "dev": "nodemon backend/server.js"
   },
   "dependencies": {
     "bcryptjs": "^3.0.3",
