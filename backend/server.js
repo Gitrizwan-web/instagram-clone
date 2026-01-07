@@ -14,9 +14,7 @@ import { app, server } from "./Socket/Socket.js";
 dotenv.config();
 connectDB();
 
-/* Proper __dirname for ES Modules */
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+
 
 /* Middleware */
 app.use(express.json());
@@ -43,17 +41,7 @@ app.get("/health", (req, res) => {
   });
 });
 
-/* Serve Frontend (Vite build) */
-app.use(
-  express.static(path.join(__dirname, "..", "frontend", "dist"))
-);
 
-/* EXPRESS 5 CATCH-ALL (REGEX — REQUIRED) */
-app.get(/.*/, (req, res) => {
-  res.sendFile(
-    path.join(__dirname, "..", "frontend", "dist", "index.html")
-  );
-});
 
 /* Server */
 const PORT = process.env.PORT || 5000;
