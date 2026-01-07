@@ -3,11 +3,12 @@
   "version": "1.0.0",
   "type": "module",
   "main": "backend/server.js",
-  "scripts": {
-    "start": "node backend/server.js",
-    "dev": "nodemon backend/server.js",
-      "heroku-postbuild": "echo 'skip build'"
-  },
+"scripts": {
+  "dev": "nodemon backend/index.js",
+  "start": "node backend/index.js",
+  "heroku-postbuild": "echo 'skip build'"
+}
+
   "dependencies": {
     "bcryptjs": "^3.0.3",
     "cloudinary": "^2.8.0",
