@@ -38,14 +38,7 @@ const App = () => {
         timeout: 5000,
       });
 
-      socketRef.current.on("connect", () => {
-        console.log("Socket.IO connected");
-      });
-
-      socketRef.current.on("connect_error", (error) => {
-        console.warn("Socket.IO connection error (this is normal on Vercel):", error.message);
-        // Don't crash the app if Socket.IO fails
-      });
+      socketRef.current.on("connect_error", () => {});
 
       socketRef.current.on("getonlineUsers", (users) => {
         dispatch(setonlineUsers(users || []));
@@ -57,7 +50,6 @@ const App = () => {
         }
       });
     } catch (error) {
-      console.warn("Socket.IO initialization failed (this is normal on Vercel):", error);
       // App continues to work without real-time features
     }
 

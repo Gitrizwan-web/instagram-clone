@@ -3,42 +3,37 @@ import cors from "cors";
 import cookieParser from "cookie-parser";
 import dotenv from "dotenv";
 
-// Load environment variables first
 dotenv.config();
 
-// Import routes and utilities
 import postRoutes from "./Routes/post.routes.js";
 import messageRoutes from "./Routes/meassage.route.js";
 import userRoutes from "./Routes/user.routes.js";
 import connectDB from "./utils/db.js";
 import { app, server } from "./Socket/Socket.js";
 
-// Connect to database (non-blocking, won't crash if it fails)
-// For Vercel serverless, connect on first request if needed
-if (process.env.VERCEL !== "1") {
-  connectDB().catch((error) => {
-    console.error("Database connection error:", error);
-  });
-}
+let dbConnectionAttempted = false;
 
-
-
-/* Security Headers Middleware */
+const ensureDBConnection = async () => {
+  if (dbConnectionAttempted) return;
+  dbConnectionAttempted = true;
+  
+  try {
+    await connectDB();
+  } catch (error) {
+    console.error("Database connection error:", error.message);
+  }
+};
 app.use((req, res, next) => {
-  // Force HTTPS in production
   if (process.env.VERCEL === "1" && req.headers["x-forwarded-proto"] !== "https") {
     return res.redirect(301, `https://${req.headers.host}${req.url}`);
   }
 
-  // Security headers
   res.setHeader("X-Content-Type-Options", "nosniff");
   res.setHeader("X-Frame-Options", "DENY");
   res.setHeader("X-XSS-Protection", "1; mode=block");
   res.setHeader("Referrer-Policy", "strict-origin-when-cross-origin");
   res.setHeader("Permissions-Policy", "geolocation=(), microphone=(), camera=()");
   
-  // Content Security Policy (relaxed for API endpoints)
-  // For API, we don't need strict CSP, but set it for security
   if (req.path.startsWith("/api/")) {
     res.setHeader(
       "Content-Security-Policy",
@@ -51,7 +46,6 @@ app.use((req, res, next) => {
     );
   }
 
-  // Strict Transport Security (HSTS) - only in production
   if (process.env.VERCEL === "1" || process.env.NODE_ENV === "production") {
     res.setHeader("Strict-Transport-Security", "max-age=31536000; includeSubDomains; preload");
   }
@@ -59,28 +53,23 @@ app.use((req, res, next) => {
   next();
 });
 
-/* Middleware */
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
-// CORS configuration - allow multiple origins
 const allowedOrigins = [
   "http://localhost:5173",
   "http://localhost:3000",
   process.env.CLIENT_URL,
   "https://instagram-clone-bnpm.vercel.app",
-  // Allow all Vercel preview deployments (for testing)
   /^https:\/\/instagram-clone.*\.vercel\.app$/,
-].filter(Boolean); // Remove undefined values
+].filter(Boolean);
 
 app.use(
   cors({
     origin: function (origin, callback) {
-      // Allow requests with no origin (like mobile apps or curl requests)
       if (!origin) return callback(null, true);
       
-      // Check if origin is in allowed list
       const isAllowed = allowedOrigins.some(allowed => {
         if (typeof allowed === "string") {
           return allowed === origin;
@@ -90,26 +79,18 @@ app.use(
         return false;
       });
       
-      if (isAllowed || process.env.NODE_ENV === "development") {
-        callback(null, true);
-      } else {
-        // Log for debugging
-        console.log("CORS: Blocked origin:", origin);
-        // Allow for now, but you can restrict this later
-        callback(null, true);
-      }
+      callback(null, isAllowed || process.env.NODE_ENV === "development");
     },
     credentials: true,
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"],
     allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With", "Accept"],
     exposedHeaders: ["Content-Range", "X-Content-Range"],
-    maxAge: 86400, // 24 hours
-    preflightContinue: false, // Let CORS handle preflight
-    optionsSuccessStatus: 204, // Some legacy browsers (IE11) choke on 204
+    maxAge: 86400,
+    preflightContinue: false,
+    optionsSuccessStatus: 204,
   })
 );
 
-// Explicitly handle OPTIONS requests for all routes (CORS preflight)
 app.options("*", (req, res) => {
   res.header("Access-Control-Allow-Origin", req.headers.origin || "*");
   res.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS, PATCH");
@@ -119,20 +100,18 @@ app.options("*", (req, res) => {
   res.sendStatus(204);
 });
 
-/* API Routes */
+app.use("/api", async (req, res, next) => {
+  await ensureDBConnection().catch(() => {});
+  next();
+});
+
 app.use("/api/v1/user", userRoutes);
 app.use("/api/v1/post", postRoutes);
 app.use("/api/v1/message", messageRoutes);
 
-/* Root Route */
 app.get("/", async (req, res) => {
   try {
-    // Try to connect DB if not connected (for serverless)
-    if (process.env.VERCEL === "1") {
-      await connectDB().catch(() => {
-        // Ignore connection errors, continue anyway
-      });
-    }
+    await ensureDBConnection();
 
     res.status(200).json({
       success: true,
@@ -160,7 +139,6 @@ app.get("/", async (req, res) => {
   }
 });
 
-/* Health Check */
 app.get("/health", async (req, res) => {
   try {
     const mongoose = (await import("mongoose")).default;
@@ -182,7 +160,6 @@ app.get("/health", async (req, res) => {
   }
 });
 
-// Error handling middleware
 app.use((err, req, res, next) => {
   console.error("Error:", err);
   res.status(err.status || 500).json({
@@ -192,7 +169,6 @@ app.use((err, req, res, next) => {
   });
 });
 
-// 404 handler
 app.use((req, res) => {
   res.status(404).json({
     success: false,
@@ -201,17 +177,14 @@ app.use((req, res) => {
   });
 });
 
-
-
-/* Server */
 const PORT = process.env.PORT || 5000;
 
-// Only start server if not in Vercel environment
-if (process.env.VERCEL !== "1") {
-  server.listen(PORT, () => {
-    console.log(`Server running on port ${PORT}`);
-  });
+if (process.env.VERCEL !== "1" && server && typeof server.listen === "function") {
+  try {
+    server.listen(PORT);
+  } catch (error) {
+    console.error("Server startup error:", error.message);
+  }
 }
 
-// Export app for Vercel serverless functions
 export default app;

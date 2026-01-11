@@ -1,7 +1,6 @@
 import jwt from "jsonwebtoken";
 
 const isauth = (req, res, next) => {
-  // Skip authentication for OPTIONS requests (CORS preflight)
   if (req.method === "OPTIONS") {
     return next();
   }
@@ -26,10 +25,8 @@ const isauth = (req, res, next) => {
     }
 
     req.id = decode.userId;
-
     next();
   } catch (error) {
-    console.log(error);
     return res.status(500).json({
       message: "Server Error",
       success: false,

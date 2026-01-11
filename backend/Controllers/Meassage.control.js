@@ -41,7 +41,7 @@ export const sendMessage = async (req, res) => {
       newMessage,
     });
   } catch (error) {
-    console.log(error);
+    console.error(error);
     return res.status(500).json({ success: false, error: "Server Error" });
   }
 };
@@ -58,6 +58,6 @@ export const getMessage = async (req,res) => {
         return res.status(200).json({success:true, messages:conversation?.messages});
         
     } catch (error) {
-        console.log(error);
+        console.error(error);
     }
 }

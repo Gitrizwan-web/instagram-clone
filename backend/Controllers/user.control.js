@@ -35,7 +35,7 @@ export const register = async (req, res) => {
       .status(201)
       .json({ message: "Account Created Successfully", success: true });
   } catch (error) {
-    console.log(error);
+    console.error(error);
     return res.status(500).json({ message: "Server Error" });
   }
 };
@@ -95,7 +95,7 @@ export const login = async (req, res) => {
       .status(200)
       .json({ message: `Welcome Back ${user.username}`, user, success: true });
   } catch (error) {
-    console.log(error);
+    console.error(error);
     return res.status(500).json({ message: "Server Error" });
   }
 };
@@ -106,7 +106,7 @@ export const logout = async (req, res) => {
       .cookie("token", "", { maxAge: 0 })
       .json({ message: "Logged out successfully", success: true });
   } catch (error) {
-    console.log(error);
+    console.error(error);
   }
 };
 
@@ -136,7 +136,7 @@ export const getprofile = async (req, res) => {
       user,
     });
   } catch (error) {
-    console.log(error);
+    console.error(error);
     return res.status(500).json({
       success: false,
       message: "Server error",
@@ -171,7 +171,7 @@ export const editprofile = async (req, res) => {
 
     res.status(200).json({ message: "Profile Updated", user, success: true });
   } catch (error) {
-    console.log(error);
+    console.error(error);
     res.status(500).json({ message: "Server Error", success: false });
   }
 };
@@ -189,7 +189,7 @@ export const getsuggesteduser = async (req, res) => {
 
     return res.status(200).json({ users: suggesteduser, success: true });
   } catch (error) {
-    console.log(error);
+    console.error(error);
     return res.status(500).json({ message: "Server error" });
   }
 };
