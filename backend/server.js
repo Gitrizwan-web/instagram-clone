@@ -101,8 +101,20 @@ app.use(
     allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With", "Accept"],
     exposedHeaders: ["Content-Range", "X-Content-Range"],
     maxAge: 86400, // 24 hours
+    preflightContinue: false, // Let CORS handle preflight
+    optionsSuccessStatus: 204, // Some legacy browsers (IE11) choke on 204
   })
 );
+
+// Explicitly handle OPTIONS requests for all routes (CORS preflight)
+app.options("*", (req, res) => {
+  res.header("Access-Control-Allow-Origin", req.headers.origin || "*");
+  res.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS, PATCH");
+  res.header("Access-Control-Allow-Headers", "Content-Type, Authorization, X-Requested-With, Accept");
+  res.header("Access-Control-Allow-Credentials", "true");
+  res.header("Access-Control-Max-Age", "86400");
+  res.sendStatus(204);
+});
 
 /* API Routes */
 app.use("/api/v1/user", userRoutes);

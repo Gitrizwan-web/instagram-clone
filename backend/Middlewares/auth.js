@@ -1,6 +1,11 @@
 import jwt from "jsonwebtoken";
 
 const isauth = (req, res, next) => {
+  // Skip authentication for OPTIONS requests (CORS preflight)
+  if (req.method === "OPTIONS") {
+    return next();
+  }
+
   try {
     const token = req.cookies.token;
 
