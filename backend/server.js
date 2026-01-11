@@ -46,6 +46,12 @@ app.get("/health", (req, res) => {
 /* Server */
 const PORT = process.env.PORT || 5000;
 
-server.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
-});
+// Only start server if not in Vercel environment
+if (process.env.VERCEL !== "1") {
+  server.listen(PORT, () => {
+    console.log(`Server running on port ${PORT}`);
+  });
+}
+
+// Export app for Vercel serverless functions
+export default app;
