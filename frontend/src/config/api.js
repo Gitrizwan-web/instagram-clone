@@ -1,22 +1,25 @@
 const getBaseUrl = () => {
-  // Explicit env override (recommended)
   if (import.meta.env.VITE_API_URL) {
-    return import.meta.env.VITE_API_URL.replace(/\/$/, "");
+    const url = import.meta.env.VITE_API_URL;
+    return url.startsWith("http://") && !url.includes("localhost")
+      ? url.replace("http://", "https://")
+      : url;
   }
 
-  // Local development
   if (import.meta.env.DEV) {
     return "http://localhost:3000";
   }
 
-  // Production BACKEND URL (NOT frontend)
-  return "https://instagram-clone-lb97i4je3-gitrizwan-webs-projects.vercel.app";
+  return "https://instagram-clone-mauve-iota.vercel.app";
 };
 
 export const API_BASE_URL = getBaseUrl();
 
 export const SOCKET_URL =
-  import.meta.env.VITE_SOCKET_URL || API_BASE_URL;
+  import.meta.env.VITE_SOCKET_URL ||
+  (import.meta.env.DEV
+    ? "http://localhost:3000"
+    : "https://instagram-clone-mauve-iota.vercel.app");
 
 export const getApiUrl = (endpoint) => {
   const cleanEndpoint = endpoint.startsWith("/")
