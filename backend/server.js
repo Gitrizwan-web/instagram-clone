@@ -12,7 +12,11 @@ import connectDB from "./utils/db.js";
 import { app, server } from "./Socket/Socket.js";
 
 dotenv.config();
-connectDB();
+
+// Connect to database (non-blocking, won't crash if it fails)
+connectDB().catch((error) => {
+  console.error("Database connection error:", error);
+});
 
 
 
@@ -48,10 +52,43 @@ app.get("/", (req, res) => {
 });
 
 /* Health Check */
-app.get("/health", (req, res) => {
-  res.status(200).json({
-    success: true,
-    message: "Backend running",
+app.get("/health", async (req, res) => {
+  try {
+    const mongoose = (await import("mongoose")).default;
+    const dbStatus = mongoose.connection.readyState === 1 ? "connected" : "disconnected";
+    
+    res.status(200).json({
+      success: true,
+      message: "Backend running",
+      database: dbStatus,
+      environment: process.env.VERCEL ? "vercel" : "local"
+    });
+  } catch (error) {
+    res.status(200).json({
+      success: true,
+      message: "Backend running",
+      database: "unknown",
+      error: error.message
+    });
+  }
+});
+
+// Error handling middleware
+app.use((err, req, res, next) => {
+  console.error("Error:", err);
+  res.status(err.status || 500).json({
+    success: false,
+    message: err.message || "Internal Server Error",
+    ...(process.env.NODE_ENV === "development" && { stack: err.stack })
+  });
+});
+
+// 404 handler
+app.use((req, res) => {
+  res.status(404).json({
+    success: false,
+    message: "Route not found",
+    path: req.path
   });
 });
 

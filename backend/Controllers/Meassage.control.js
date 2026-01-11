@@ -28,10 +28,12 @@ export const sendMessage = async (req, res) => {
 
     await Promise.all([conversation.save(), newMessage.save()]);
 
-    // Socket IO real-time emit
-    const receiverSocketId = getReciverSocketId(receiverId);
-    if (receiverSocketId) {
-      io.to(receiverSocketId).emit("newMessage", newMessage);
+    // Socket IO real-time emit (only if io is available - not on Vercel)
+    if (io) {
+      const receiverSocketId = getReciverSocketId(receiverId);
+      if (receiverSocketId) {
+        io.to(receiverSocketId).emit("newMessage", newMessage);
+      }
     }
 
     return res.status(201).json({

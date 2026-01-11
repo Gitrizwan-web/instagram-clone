@@ -112,7 +112,9 @@ export const likePost = async (req, res) => {
                 message:'Your post was liked'
             }
             const postOwnerSocketId = getReciverSocketId(postOwnerId);
-            io.to(postOwnerSocketId).emit('notification', notification);
+            if (io && postOwnerSocketId) {
+                io.to(postOwnerSocketId).emit('notification', notification);
+            }
         }
 
         return res.status(200).json({message:'Post liked', success:true});
@@ -144,7 +146,9 @@ export const dislikePost = async (req, res) => {
                 message:'Your post was liked'
             }
             const postOwnerSocketId = getReciverSocketId(postOwnerId);
-            io.to(postOwnerSocketId).emit('notification', notification);
+            if (io && postOwnerSocketId) {
+                io.to(postOwnerSocketId).emit('notification', notification);
+            }
         }
 
 
