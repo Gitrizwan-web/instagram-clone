@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { Avatar, AvatarFallback, AvatarImage } from "./components/ui/avatar";
 import { Button } from "./components/ui/button";
 import axios from "axios";
-import { setAuthUser } from "../redux/authslice";
+import { setAuthUser } from "../Redux/authslice";
 import { toast } from "sonner";
 
 

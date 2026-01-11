@@ -1,7 +1,7 @@
 import sharp from "sharp";
 import cloudinary from "../utils/cloudinary.js";
-import Post  from "../models/post.model.js";
-import User  from "../models/user.model.js";
+import Post  from "../Models/Post.model.js";
+import User  from "../Models/user.model.js";
 import Comment  from "../Models/comment.model.js";
 import { getReciverSocketId, io } from "../Socket/Socket.js";
 

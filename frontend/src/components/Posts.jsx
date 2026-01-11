@@ -1,7 +1,7 @@
 import React from "react";
 import { useSelector } from "react-redux";
 import Post from "./Post";
-import usegetallpost from "../hooks/usegetallpost";
+import usegetallpost from "../Hooks/usegetallpost";
 
 const Posts = () => {
   usegetallpost();

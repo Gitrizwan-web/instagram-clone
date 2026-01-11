@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Avatar, AvatarFallback, AvatarImage } from "./components/ui/avatar";
 import { setselecteduser } from "../Redux/authslice";
-import { setmessages, addMessage, clearMessages, setonlineUsers } from "../Redux/chatSlice"; // check your slice name and action names
+import { setmessages, addMessage, clearMessages, setonlineUsers } from "../Redux/Chatslice";
 import { Link } from "react-router-dom";
 import { Button } from "./components/ui/button";
 
