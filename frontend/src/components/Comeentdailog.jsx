@@ -7,6 +7,7 @@ import { useDispatch, useSelector } from "react-redux";
 import axios from "axios";
 import { setPosts } from "../Redux/postslice";
 import { toast } from "sonner";
+import { getApiUrl } from "../config/api";
 
 const Comeentdailog = ({ open, setopen }) => {
   const dispatch = useDispatch();
@@ -60,7 +61,7 @@ const Comeentdailog = ({ open, setopen }) => {
   const followOrUnfollowHandler = async () => {
     try {
       const res = await axios.get(
-        `http://localhost:3000/api/v1/user/followorunfollow/${reduxSelectedPost.author._id}`,
+        getApiUrl(`api/v1/user/followorunfollow/${reduxSelectedPost.author._id}`),
         { withCredentials: true }
       );
 
@@ -109,7 +110,7 @@ const Comeentdailog = ({ open, setopen }) => {
 
     try {
       const res = await axios.post(
-        `http://localhost:3000/api/v1/post/${reduxSelectedPost._id}/comment`,
+        getApiUrl(`api/v1/post/${reduxSelectedPost._id}/comment`),
         { text: tempComment.text },
         { withCredentials: true }
       );
@@ -138,7 +139,7 @@ const Comeentdailog = ({ open, setopen }) => {
 
     try {
       setDeleting(true);
-      await axios.delete(`http://localhost:3000/api/v1/post/${reduxSelectedPost._id}`, {
+      await axios.delete(getApiUrl(`api/v1/post/${reduxSelectedPost._id}`), {
         withCredentials: true,
       });
       const updatedPosts = posts.filter((p) => p._id !== reduxSelectedPost._id);
@@ -156,7 +157,7 @@ const Comeentdailog = ({ open, setopen }) => {
   const bookmarkHandler = async () => {
     try {
       const res = await axios.post(
-        `http://localhost:3000/api/v1/post/${reduxSelectedPost._id}/bookmark`,
+        getApiUrl(`api/v1/post/${reduxSelectedPost._id}/bookmark`),
         {},
         { withCredentials: true }
       );

@@ -6,6 +6,7 @@ import axios from "axios";
 import { toast, Toaster } from "sonner";
 import { useDispatch, useSelector } from "react-redux";  // <-- useSelector भी import करें
 import { setAuthUser } from "../Redux/authslice";
+import { getApiUrl } from "../config/api";
 
 const InstaLogin = () => {
   const navigate = useNavigate();
@@ -29,7 +30,7 @@ const InstaLogin = () => {
 
     try {
       const res = await axios.post(
-        "http://localhost:3000/api/v1/user/login",
+        getApiUrl("api/v1/user/login"),
         input,
         {
           headers: { "Content-Type": "application/json" },

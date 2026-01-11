@@ -2,6 +2,7 @@ import { useEffect } from "react";
 import { useDispatch } from "react-redux";
 import axios from "axios";
 import { setPosts } from "../Redux/postslice";
+import { getApiUrl } from "../config/api";
 
 
 const usegetallpost = () => {
@@ -11,7 +12,7 @@ const usegetallpost = () => {
     const fetchPosts = async () => {
       try {
         const res = await axios.get(
-          "http://localhost:3000/api/v1/post/all",
+          getApiUrl("api/v1/post/all"),
           { withCredentials: true }
         );
 

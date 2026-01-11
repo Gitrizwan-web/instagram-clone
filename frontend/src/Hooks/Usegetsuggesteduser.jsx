@@ -2,6 +2,7 @@ import { useEffect } from "react";
 import { useDispatch } from "react-redux";
 import axios from "axios";
 import { setsuggesteduser } from "../Redux/authslice";
+import { getApiUrl } from "../config/api";
 
 const usegetsuggesteduser = () => {
   const dispatch = useDispatch();
@@ -9,7 +10,7 @@ const usegetsuggesteduser = () => {
   useEffect(() => {
     const fetchSuggestedUsers = async () => {
       try {
-        const res = await axios.get("http://localhost:3000/api/v1/user/suggested", {
+        const res = await axios.get(getApiUrl("api/v1/user/suggested"), {
           withCredentials: true,
         });
         if (res.data.success) {

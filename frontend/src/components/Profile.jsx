@@ -16,6 +16,7 @@ import {
 import axios from "axios";
 import { toast } from "sonner";
 import { setAuthUser } from "../Redux/authslice";
+import { getApiUrl } from "../config/api";
 
 const Profile = () => {
   const { id: userId } = useParams();
@@ -59,7 +60,7 @@ const handleFollowToggle = async () => {
 
   try {
     const res = await axios.get(
-      `http://localhost:3000/api/v1/user/followorunfollow/${userprofile._id}`,
+      getApiUrl(`api/v1/user/followorunfollow/${userprofile._id}`),
       { withCredentials: true }
     );
 

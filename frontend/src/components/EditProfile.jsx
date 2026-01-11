@@ -5,6 +5,7 @@ import { Button } from "./components/ui/button";
 import axios from "axios";
 import { setAuthUser } from "../Redux/authslice";
 import { toast } from "sonner";
+import { getApiUrl } from "../config/api";
 
 
 const EditProfile = () => {
@@ -36,7 +37,7 @@ const handleSubmit = async () => {
     if (profilePicture) formData.append("profilePicture", profilePicture);
 
     const { data } = await axios.post(
-      "http://localhost:3000/api/v1/user/profile/edit",
+      getApiUrl("api/v1/user/profile/edit"),
       formData,
       {
         headers: { "Content-Type": "multipart/form-data" },

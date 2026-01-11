@@ -11,6 +11,7 @@ import { toast } from "sonner";
 import { removePost, setPosts, setSelectedPost } from "../Redux/postslice";
 import { Badge } from "./components/ui/badge";
 import { Link } from "react-router-dom";
+import { getApiUrl } from "../config/api";
 
 const Post = ({ post }) => {
   const user = useSelector((state) => state.auth.user);
@@ -57,7 +58,7 @@ const Post = ({ post }) => {
     try {
       // Call backend route to toggle follow/unfollow
       const res = await axios.get(
-        `http://localhost:3000/api/v1/user/followorunfollow/${author._id}`,
+        getApiUrl(`api/v1/user/followorunfollow/${author._id}`),
         { withCredentials: true }
       );
 
@@ -95,7 +96,7 @@ const Post = ({ post }) => {
       const action = liked ? "dislike" : "like";
 
       const res = await axios.get(
-        `http://localhost:3000/api/v1/post/${_id}/${action}`,
+        getApiUrl(`api/v1/post/${_id}/${action}`),
         { withCredentials: true }
       );
 
@@ -125,7 +126,7 @@ const Post = ({ post }) => {
 
     try {
       const res = await axios.post(
-        `http://localhost:3000/api/v1/post/${_id}/comment`,
+        getApiUrl(`api/v1/post/${_id}/comment`),
         { text },
         {
           headers: { "Content-Type": "application/json" },
@@ -150,7 +151,7 @@ const Post = ({ post }) => {
   const bookmarkHandler = async () => {
     try {
       const res = await axios.post(
-        `http://localhost:3000/api/v1/post/${_id}/bookmark`,
+        getApiUrl(`api/v1/post/${_id}/bookmark`),
         {},
         { withCredentials: true }
       );
@@ -173,7 +174,7 @@ const Post = ({ post }) => {
     try {
       setDeleting(true);
       const res = await axios.delete(
-        `http://localhost:3000/api/v1/post/delete/${_id}`,
+        getApiUrl(`api/v1/post/delete/${_id}`),
         { withCredentials: true }
       );
 

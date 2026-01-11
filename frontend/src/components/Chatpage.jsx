@@ -9,8 +9,7 @@ import { Button } from "./components/ui/button";
 import { MessageCircle, ChevronLeft, Send } from "lucide-react";
 import axios from "axios";
 import { io } from "socket.io-client";
-
-const SOCKET_SERVER_URL = "http://localhost:3000";
+import { SOCKET_URL, getApiUrl } from "../config/api";
 
 const Chatpage = () => {
   const dispatch = useDispatch();
@@ -28,7 +27,7 @@ const Chatpage = () => {
   useEffect(() => {
     if (!user?._id) return;
 
-    const socketIo = io(SOCKET_SERVER_URL, {
+    const socketIo = io(SOCKET_URL, {
       auth: { token: localStorage.getItem("token") },
       query: { userId: user._id },
     });
@@ -75,7 +74,7 @@ const Chatpage = () => {
       try {
         const token = localStorage.getItem("token");
         const res = await axios.get(
-          `http://localhost:3000/api/v1/message/all/${selectedUser._id}`,
+          getApiUrl(`api/v1/message/all/${selectedUser._id}`),
           {
             headers: { Authorization: `Bearer ${token}` },
             withCredentials: true,
@@ -111,7 +110,7 @@ const Chatpage = () => {
 
     try {
       const res = await axios.post(
-        `http://localhost:3000/api/v1/message/send/${receiverId}`,
+        getApiUrl(`api/v1/message/send/${receiverId}`),
         { message },
         {
           headers: { "Content-Type": "application/json" },

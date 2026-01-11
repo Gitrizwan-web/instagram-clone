@@ -5,6 +5,7 @@ import axios from "axios";
 import { toast, Toaster } from "sonner";
 import { Link, useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
+import { getApiUrl } from "../config/api";
 
 const InstaSignup = () => {
   const navigate = useNavigate();
@@ -26,7 +27,7 @@ const InstaSignup = () => {
     setLoading(true);
     try {
       const res = await axios.post(
-        "http://localhost:3000/api/v1/user/register",
+        getApiUrl("api/v1/user/register"),
         input,
         {
           headers: { "Content-Type": "application/json" },

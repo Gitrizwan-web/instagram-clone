@@ -13,6 +13,7 @@ import Chatpage from "./components/Chatpage";
 
 import { setonlineUsers } from "./Redux/Chatslice";
 import { setlikeNotification } from "./Redux/rtnslice";
+import { SOCKET_URL } from "./config/api";
 
 import Explorer from "./components/Explorer";
 import ProtectedRoute from "./components/ProtectedRoute";
@@ -25,8 +26,7 @@ const App = () => {
   useEffect(() => {
     if (!user?._id) return;
 
-    // Hardcoded Socket URL to avoid `process is not defined` error
-    const socketUrl = "http://localhost:3000";
+    const socketUrl = SOCKET_URL;
 
     socketRef.current = io(socketUrl, {
       query: { userId: user._id },

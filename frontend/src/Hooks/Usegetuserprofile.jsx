@@ -1,18 +1,19 @@
 import { useEffect } from "react";
 import { useDispatch } from "react-redux";
 import axios from "axios";
-import { setuserProfile } from "../Redux/authslice";  // path ठीक रखें
+import { setuserProfile } from "../Redux/authslice";
+import { getApiUrl } from "../config/api";
 
 const useGetUserProfile = (userId) => {
   const dispatch = useDispatch();
 
   useEffect(() => {
-    if (!userId) return;  // अगर userId नहीं है तो कुछ न करें
+    if (!userId) return;
 
     const fetchUserProfile = async () => {
       try {
         const res = await axios.get(
-          `http://localhost:3000/api/v1/user/${userId}/profile`,
+          getApiUrl(`api/v1/user/${userId}/profile`),
           {
             withCredentials: true,
           }

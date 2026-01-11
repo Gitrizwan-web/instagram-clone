@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
+import { getApiUrl } from "../config/api";
 
 const Explorer = () => {
   const [posts, setPosts] = useState([]);
@@ -11,7 +12,7 @@ const Explorer = () => {
       setLoading(true);
       try {
         const { data } = await axios.get(
-          "http://localhost:3000/api/v1/user/explore",
+          getApiUrl("api/v1/user/explore"),
           { withCredentials: true }
         );
         if (data.success) {

@@ -8,6 +8,7 @@ import { toast } from "sonner";
 import axios from "axios";
 import { useDispatch, useSelector } from "react-redux";
 import { addPost } from "../Redux/postslice";
+import { getApiUrl } from "../config/api";
 
 const Createpost = ({ open, setOpen }) => {
   const dispatch = useDispatch();
@@ -48,7 +49,7 @@ const Createpost = ({ open, setOpen }) => {
       }
 
       const res = await axios.post(
-        "http://localhost:3000/api/v1/post/addpost",
+        getApiUrl("api/v1/post/addpost"),
         formData,
         {
           withCredentials: true,

@@ -4,8 +4,9 @@ import { Avatar, AvatarFallback, AvatarImage } from "./components/ui/avatar";
 import { Link } from "react-router-dom";
 import usegetsuggesteduser from "../Hooks/Usegetsuggesteduser";
 import axios from "axios";
-import { setsuggesteduser } from "../Redux/authslice"; // Your Redux action
+import { setsuggesteduser } from "../Redux/authslice";
 import { toast } from "sonner";
+import { getApiUrl } from "../config/api";
 
 const SuggestedUser = () => {
   usegetsuggesteduser();
@@ -32,7 +33,7 @@ const SuggestedUser = () => {
 
     try {
       const res = await axios.get(
-        `http://localhost:3000/api/v1/user/followorunfollow/${userId}`,
+        getApiUrl(`api/v1/user/followorunfollow/${userId}`),
         { withCredentials: true }
       );
 

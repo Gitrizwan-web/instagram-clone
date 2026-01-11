@@ -13,6 +13,7 @@ import { Avatar, AvatarImage, AvatarFallback } from "./components/ui/avatar";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { setAuthUser } from "../Redux/authslice";
+import { getApiUrl } from "../config/api";
 import axios from "axios";
 import { toast } from "sonner";
 import Createpost from "./Createpost";
@@ -122,7 +123,7 @@ const Leftsidebar = () => {
 
   const logoutHandler = useCallback(async () => {
     try {
-      await axios.get("http://localhost:3000/api/v1/user/logout", {
+      await axios.get(getApiUrl("api/v1/user/logout"), {
         withCredentials: true,
       });
       dispatch(setAuthUser(null));
@@ -141,7 +142,7 @@ const Leftsidebar = () => {
       try {
         setLoadingSearch(true);
         const { data } = await axios.get(
-          `http://localhost:3000/api/v1/user/search?q=${encodeURIComponent(query)}`,
+          getApiUrl(`api/v1/user/search?q=${encodeURIComponent(query)}`),
           { withCredentials: true }
         );
         if (data.success) {
