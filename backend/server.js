@@ -33,6 +33,20 @@ app.use("/api/v1/user", userRoutes);
 app.use("/api/v1/post", postRoutes);
 app.use("/api/v1/message", messageRoutes);
 
+/* Root Route */
+app.get("/", (req, res) => {
+  res.status(200).json({
+    success: true,
+    message: "Instagram Clone API is running",
+    endpoints: {
+      health: "/health",
+      user: "/api/v1/user",
+      post: "/api/v1/post",
+      message: "/api/v1/message"
+    }
+  });
+});
+
 /* Health Check */
 app.get("/health", (req, res) => {
   res.status(200).json({
