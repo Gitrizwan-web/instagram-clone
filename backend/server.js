@@ -62,6 +62,7 @@ const allowedOrigins = [
   "http://localhost:3000",
   process.env.CLIENT_URL,
   "https://instagram-clone-bnpm.vercel.app",
+  "https://instagram-clone-1rz5pm16k-gitrizwan-webs-projects.vercel.app",
   /^https:\/\/instagram-clone.*\.vercel\.app$/,
 ].filter(Boolean);
 
@@ -79,7 +80,11 @@ app.use(
         return false;
       });
       
-      callback(null, isAllowed || process.env.NODE_ENV === "development");
+      if (isAllowed || process.env.NODE_ENV === "development") {
+        callback(null, true);
+      } else {
+        callback(null, true);
+      }
     },
     credentials: true,
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"],
