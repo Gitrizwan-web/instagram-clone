@@ -91,17 +91,8 @@ app.use(
   })
 );
 
-app.options("*", (req, res) => {
-  res.header("Access-Control-Allow-Origin", req.headers.origin || "*");
-  res.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS, PATCH");
-  res.header("Access-Control-Allow-Headers", "Content-Type, Authorization, X-Requested-With, Accept");
-  res.header("Access-Control-Allow-Credentials", "true");
-  res.header("Access-Control-Max-Age", "86400");
-  res.sendStatus(204);
-});
-
-app.use("/api", async (req, res, next) => {
-  await ensureDBConnection().catch(() => {});
+app.use("/api", (req, res, next) => {
+  ensureDBConnection().catch(() => {});
   next();
 });
 
@@ -109,11 +100,11 @@ app.use("/api/v1/user", userRoutes);
 app.use("/api/v1/post", postRoutes);
 app.use("/api/v1/message", messageRoutes);
 
-app.get("/", async (req, res) => {
+app.get("/", (req, res) => {
   try {
-    await ensureDBConnection();
-
-    res.status(200).json({
+    ensureDBConnection().catch(() => {});
+    
+    return res.status(200).json({
       success: true,
       message: "Instagram Clone API is running",
       endpoints: {
@@ -125,10 +116,9 @@ app.get("/", async (req, res) => {
       environment: process.env.VERCEL ? "vercel" : "local"
     });
   } catch (error) {
-    res.status(200).json({
+    return res.status(200).json({
       success: true,
       message: "Instagram Clone API is running",
-      error: error.message,
       endpoints: {
         health: "/health",
         user: "/api/v1/user",
@@ -162,11 +152,14 @@ app.get("/health", async (req, res) => {
 
 app.use((err, req, res, next) => {
   console.error("Error:", err);
-  res.status(err.status || 500).json({
-    success: false,
-    message: err.message || "Internal Server Error",
-    ...(process.env.NODE_ENV === "development" && { stack: err.stack })
-  });
+  
+  if (!res.headersSent) {
+    res.status(err.status || 500).json({
+      success: false,
+      message: err.message || "Internal Server Error",
+      ...(process.env.NODE_ENV === "development" && { stack: err.stack })
+    });
+  }
 });
 
 app.use((req, res) => {
