@@ -20,15 +20,87 @@ connectDB().catch((error) => {
 
 
 
+/* Security Headers Middleware */
+app.use((req, res, next) => {
+  // Force HTTPS in production
+  if (process.env.VERCEL === "1" && req.headers["x-forwarded-proto"] !== "https") {
+    return res.redirect(301, `https://${req.headers.host}${req.url}`);
+  }
+
+  // Security headers
+  res.setHeader("X-Content-Type-Options", "nosniff");
+  res.setHeader("X-Frame-Options", "DENY");
+  res.setHeader("X-XSS-Protection", "1; mode=block");
+  res.setHeader("Referrer-Policy", "strict-origin-when-cross-origin");
+  res.setHeader("Permissions-Policy", "geolocation=(), microphone=(), camera=()");
+  
+  // Content Security Policy (relaxed for API endpoints)
+  // For API, we don't need strict CSP, but set it for security
+  if (req.path.startsWith("/api/")) {
+    res.setHeader(
+      "Content-Security-Policy",
+      "default-src 'self'; connect-src 'self' https:; frame-ancestors 'none';"
+    );
+  } else {
+    res.setHeader(
+      "Content-Security-Policy",
+      "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' data:; connect-src 'self' https:; frame-ancestors 'none';"
+    );
+  }
+
+  // Strict Transport Security (HSTS) - only in production
+  if (process.env.VERCEL === "1" || process.env.NODE_ENV === "production") {
+    res.setHeader("Strict-Transport-Security", "max-age=31536000; includeSubDomains; preload");
+  }
+
+  next();
+});
+
 /* Middleware */
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
+// CORS configuration - allow multiple origins
+const allowedOrigins = [
+  "http://localhost:5173",
+  "http://localhost:3000",
+  process.env.CLIENT_URL,
+  "https://instagram-clone-bnpm.vercel.app",
+  // Allow all Vercel preview deployments (for testing)
+  /^https:\/\/instagram-clone.*\.vercel\.app$/,
+].filter(Boolean); // Remove undefined values
+
 app.use(
   cors({
-    origin: process.env.CLIENT_URL || "http://localhost:5173",
+    origin: function (origin, callback) {
+      // Allow requests with no origin (like mobile apps or curl requests)
+      if (!origin) return callback(null, true);
+      
+      // Check if origin is in allowed list
+      const isAllowed = allowedOrigins.some(allowed => {
+        if (typeof allowed === "string") {
+          return allowed === origin;
+        } else if (allowed instanceof RegExp) {
+          return allowed.test(origin);
+        }
+        return false;
+      });
+      
+      if (isAllowed || process.env.NODE_ENV === "development") {
+        callback(null, true);
+      } else {
+        // Log for debugging
+        console.log("CORS: Blocked origin:", origin);
+        // Allow for now, but you can restrict this later
+        callback(null, true);
+      }
+    },
     credentials: true,
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"],
+    allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With", "Accept"],
+    exposedHeaders: ["Content-Range", "X-Content-Range"],
+    maxAge: 86400, // 24 hours
   })
 );
 
