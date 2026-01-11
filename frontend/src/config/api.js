@@ -10,13 +10,13 @@ const getBaseUrl = () => {
     return "http://localhost:3000";
   }
   
-  return "https://instagram-clone-lb97i4je3-gitrizwan-webs-projects.vercel.app";
+  return "https://instagram-clone-mauve-iota.vercel.app/";
 };
 
 export const API_BASE_URL = getBaseUrl();
 
 export const SOCKET_URL = import.meta.env.VITE_SOCKET_URL || 
-  (import.meta.env.DEV ? "http://localhost:3000" : "https://instagram-clone-lb97i4je3-gitrizwan-webs-projects.vercel.app");
+  (import.meta.env.DEV ? "http://localhost:3000" : "https://instagram-clone-mauve-iota.vercel.app/");
 
 export const getApiUrl = (endpoint) => {
   const cleanEndpoint = endpoint.startsWith("/") ? endpoint.slice(1) : endpoint;
