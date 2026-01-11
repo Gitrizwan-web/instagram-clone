@@ -2,21 +2,24 @@ import express from "express";
 import cors from "cors";
 import cookieParser from "cookie-parser";
 import dotenv from "dotenv";
-import path from "path";
-import { fileURLToPath } from "url";
 
+// Load environment variables first
+dotenv.config();
+
+// Import routes and utilities
 import postRoutes from "./Routes/post.routes.js";
 import messageRoutes from "./Routes/meassage.route.js";
 import userRoutes from "./Routes/user.routes.js";
 import connectDB from "./utils/db.js";
 import { app, server } from "./Socket/Socket.js";
 
-dotenv.config();
-
 // Connect to database (non-blocking, won't crash if it fails)
-connectDB().catch((error) => {
-  console.error("Database connection error:", error);
-});
+// For Vercel serverless, connect on first request if needed
+if (process.env.VERCEL !== "1") {
+  connectDB().catch((error) => {
+    console.error("Database connection error:", error);
+  });
+}
 
 
 
@@ -122,17 +125,39 @@ app.use("/api/v1/post", postRoutes);
 app.use("/api/v1/message", messageRoutes);
 
 /* Root Route */
-app.get("/", (req, res) => {
-  res.status(200).json({
-    success: true,
-    message: "Instagram Clone API is running",
-    endpoints: {
-      health: "/health",
-      user: "/api/v1/user",
-      post: "/api/v1/post",
-      message: "/api/v1/message"
+app.get("/", async (req, res) => {
+  try {
+    // Try to connect DB if not connected (for serverless)
+    if (process.env.VERCEL === "1") {
+      await connectDB().catch(() => {
+        // Ignore connection errors, continue anyway
+      });
     }
-  });
+
+    res.status(200).json({
+      success: true,
+      message: "Instagram Clone API is running",
+      endpoints: {
+        health: "/health",
+        user: "/api/v1/user",
+        post: "/api/v1/post",
+        message: "/api/v1/message"
+      },
+      environment: process.env.VERCEL ? "vercel" : "local"
+    });
+  } catch (error) {
+    res.status(200).json({
+      success: true,
+      message: "Instagram Clone API is running",
+      error: error.message,
+      endpoints: {
+        health: "/health",
+        user: "/api/v1/user",
+        post: "/api/v1/post",
+        message: "/api/v1/message"
+      }
+    });
+  }
 });
 
 /* Health Check */

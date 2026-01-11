@@ -28,24 +28,44 @@ const App = () => {
 
     const socketUrl = SOCKET_URL;
 
-    socketRef.current = io(socketUrl, {
-      query: { userId: user._id },
-      transports: ["websocket"],
-    });
+    try {
+      socketRef.current = io(socketUrl, {
+        query: { userId: user._id },
+        transports: ["websocket", "polling"], // Fallback to polling if websocket fails
+        reconnection: true,
+        reconnectionAttempts: 3,
+        reconnectionDelay: 1000,
+        timeout: 5000,
+      });
 
-    socketRef.current.on("getonlineUsers", (users) => {
-      dispatch(setonlineUsers(users || []));
-    });
+      socketRef.current.on("connect", () => {
+        console.log("Socket.IO connected");
+      });
 
-    socketRef.current.on("notification", (data) => {
-      if (data) {
-        dispatch(setlikeNotification(data));
-      }
-    });
+      socketRef.current.on("connect_error", (error) => {
+        console.warn("Socket.IO connection error (this is normal on Vercel):", error.message);
+        // Don't crash the app if Socket.IO fails
+      });
+
+      socketRef.current.on("getonlineUsers", (users) => {
+        dispatch(setonlineUsers(users || []));
+      });
+
+      socketRef.current.on("notification", (data) => {
+        if (data) {
+          dispatch(setlikeNotification(data));
+        }
+      });
+    } catch (error) {
+      console.warn("Socket.IO initialization failed (this is normal on Vercel):", error);
+      // App continues to work without real-time features
+    }
 
     return () => {
-      socketRef.current?.disconnect();
-      socketRef.current = null;
+      if (socketRef.current) {
+        socketRef.current.disconnect();
+        socketRef.current = null;
+      }
     };
   }, [user?._id, dispatch]);
 
