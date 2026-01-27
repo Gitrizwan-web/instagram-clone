@@ -18,18 +18,13 @@ const userSocketMap = {};
 
 io.on("connection", (socket) => {
   const userId = socket.handshake.query.userId;
-
-  if (userId) {
-    userSocketMap[userId] = socket.id;
-  }
+  if (userId) userSocketMap[userId] = socket.id;
 
   io.emit("getonlineUsers", Object.keys(userSocketMap));
 
   socket.on("sendMessage", (newMessage) => {
     const receiverSocketId = userSocketMap[newMessage.receiverId];
-    if (receiverSocketId) {
-      io.to(receiverSocketId).emit("newMessage", newMessage);
-    }
+    if (receiverSocketId) io.to(receiverSocketId).emit("newMessage", newMessage);
   });
 
   socket.on("disconnect", () => {
