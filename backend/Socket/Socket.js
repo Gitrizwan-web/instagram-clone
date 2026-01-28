@@ -16,26 +16,37 @@ const io = new Server(server, {
   },
 });
 
-const userSocketMap = {};
+const userSocketMap = new Map();
 
 io.on("connection", (socket) => {
   const userId = socket.handshake.query.userId;
 
-  if (userId) userSocketMap[userId] = socket.id;
+  if (userId) {
+    userSocketMap.set(userId, socket.id);
+  }
 
-  io.emit("getonlineUsers", Object.keys(userSocketMap));
+  io.emit("getonlineUsers", Array.from(userSocketMap.keys()));
 
   socket.on("sendMessage", (newMessage) => {
-    const receiverSocketId = userSocketMap[newMessage.receiverId];
+    const receiverSocketId = userSocketMap.get(newMessage.receiverId);
     if (receiverSocketId) {
       io.to(receiverSocketId).emit("newMessage", newMessage);
     }
   });
 
   socket.on("disconnect", () => {
-    if (userId) delete userSocketMap[userId];
-    io.emit("getonlineUsers", Object.keys(userSocketMap));
+    if (userId) {
+      userSocketMap.delete(userId);
+    }
+    io.emit("getonlineUsers", Array.from(userSocketMap.keys()));
   });
 });
 
-export { io, server }; 
+// Start server function to use when running standalone
+const startServer = (port = 4000) => {
+  server.listen(port, () => {
+    console.log(`Socket.io server running on port ${port}`);
+  });
+};
+
+export { io, server, startServer };
