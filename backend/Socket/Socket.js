@@ -9,11 +9,12 @@ const io = new Server(server, {
   cors: {
     origin: [
       "https://instagram-clone-bnpm-git-main-gitrizwan-webs-projects.vercel.app",
-      "http://localhost:5173"
+      "http://localhost:5173",
     ],
     methods: ["GET", "POST"],
     credentials: true,
   },
+  transports: ["websocket"], // Fly + Vercel frontend ke liye best
 });
 
 const userSocketMap = {};
@@ -21,7 +22,9 @@ const userSocketMap = {};
 io.on("connection", (socket) => {
   const userId = socket.handshake.query.userId;
 
-  if (userId) userSocketMap[userId] = socket.id;
+  if (userId) {
+    userSocketMap[userId] = socket.id;
+  }
 
   io.emit("getonlineUsers", Object.keys(userSocketMap));
 
@@ -33,9 +36,11 @@ io.on("connection", (socket) => {
   });
 
   socket.on("disconnect", () => {
-    if (userId) delete userSocketMap[userId];
+    if (userId) {
+      delete userSocketMap[userId];
+    }
     io.emit("getonlineUsers", Object.keys(userSocketMap));
   });
 });
 
-export { io, server };
+export { app, server, io };
