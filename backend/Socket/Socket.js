@@ -9,8 +9,7 @@ const io = new Server(server, {
   cors: {
     origin: [
       "https://instagram-clone-bnpm-git-main-gitrizwan-webs-projects.vercel.app",
-      "http://localhost:5173",
-      // add any other allowed origins here
+      "http://localhost:5173"
     ],
     methods: ["GET", "POST"],
     credentials: true,
@@ -21,9 +20,8 @@ const userSocketMap = {};
 
 io.on("connection", (socket) => {
   const userId = socket.handshake.query.userId;
-  if (userId) {
-    userSocketMap[userId] = socket.id;
-  }
+
+  if (userId) userSocketMap[userId] = socket.id;
 
   io.emit("getonlineUsers", Object.keys(userSocketMap));
 
@@ -40,4 +38,4 @@ io.on("connection", (socket) => {
   });
 });
 
-export { app, server, io };
+export { io, server }; 
