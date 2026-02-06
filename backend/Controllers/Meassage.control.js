@@ -1,6 +1,18 @@
-import {Conversation} from "../Models/conversation.model.js";
-import { getReciverSocketId, io } from "../Socket/Socket.js";
-import Message from "../Models/message.model.js"
+import { Conversation } from "../Models/conversation.model.js";
+import Message from "../Models/message.model.js";
+
+const isVercel = process.env.VERCEL === "1";
+
+const getSocketHelpers = async () => {
+  if (isVercel) {
+    return { io: null, getReciverSocketId: null };
+  }
+  const module = await import("../Socket/Socket.js");
+  return {
+    io: module.io,
+    getReciverSocketId: module.getReciverSocketId,
+  };
+};
 // for chatting
 export const sendMessage = async (req, res) => {
   try {
@@ -29,7 +41,8 @@ export const sendMessage = async (req, res) => {
     await Promise.all([conversation.save(), newMessage.save()]);
 
     // Socket IO real-time emit (only if io is available - not on Vercel)
-    if (io) {
+    const { io, getReciverSocketId } = await getSocketHelpers();
+    if (io && getReciverSocketId) {
       const receiverSocketId = getReciverSocketId(receiverId);
       if (receiverSocketId) {
         io.to(receiverSocketId).emit("newMessage", newMessage);
