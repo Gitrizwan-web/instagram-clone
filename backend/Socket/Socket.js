@@ -4,43 +4,50 @@ import { Server } from "socket.io";
 
 const app = express();
 const server = http.createServer(app);
+const isVercel = process.env.VERCEL === "1";
 
-const io = new Server(server, {
-  cors: {
-    origin: [
-      "https://instagram-clone-bnpm-git-main-gitrizwan-webs-projects.vercel.app",
-      "http://localhost:5173"
-    ],
-    methods: ["GET", "POST"],
-    credentials: true,
-  },
-});
+const io = isVercel
+  ? null
+  : new Server(server, {
+      cors: {
+        origin: [
+          "https://instagram-clone-bnpm-git-main-gitrizwan-webs-projects.vercel.app",
+          "http://localhost:5173",
+        ],
+        methods: ["GET", "POST"],
+        credentials: true,
+      },
+    });
 
 const userSocketMap = new Map();
 
-io.on("connection", (socket) => {
-  const userId = socket.handshake.query.userId;
+const getReciverSocketId = (receiverId) => userSocketMap.get(receiverId);
 
-  if (userId) {
-    userSocketMap.set(userId, socket.id);
-  }
+if (io) {
+  io.on("connection", (socket) => {
+    const userId = socket.handshake.query.userId;
 
-  io.emit("getonlineUsers", Array.from(userSocketMap.keys()));
-
-  socket.on("sendMessage", (newMessage) => {
-    const receiverSocketId = userSocketMap.get(newMessage.receiverId);
-    if (receiverSocketId) {
-      io.to(receiverSocketId).emit("newMessage", newMessage);
-    }
-  });
-
-  socket.on("disconnect", () => {
     if (userId) {
-      userSocketMap.delete(userId);
+      userSocketMap.set(userId, socket.id);
     }
+
     io.emit("getonlineUsers", Array.from(userSocketMap.keys()));
+
+    socket.on("sendMessage", (newMessage) => {
+      const receiverSocketId = userSocketMap.get(newMessage.receiverId);
+      if (receiverSocketId) {
+        io.to(receiverSocketId).emit("newMessage", newMessage);
+      }
+    });
+
+    socket.on("disconnect", () => {
+      if (userId) {
+        userSocketMap.delete(userId);
+      }
+      io.emit("getonlineUsers", Array.from(userSocketMap.keys()));
+    });
   });
-});
+}
 
 // Start server function to use when running standalone
 const startServer = (port = 4000) => {
@@ -49,4 +56,4 @@ const startServer = (port = 4000) => {
   });
 };
 
-export { io, server, startServer };
+export { io, server, startServer, getReciverSocketId };
