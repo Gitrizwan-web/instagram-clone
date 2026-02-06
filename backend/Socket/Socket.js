@@ -18,6 +18,8 @@ const io = new Server(server, {
 
 const userSocketMap = new Map();
 
+const getReciverSocketId = (receiverId) => userSocketMap.get(receiverId);
+
 io.on("connection", (socket) => {
   const userId = socket.handshake.query.userId;
 
@@ -49,4 +51,4 @@ const startServer = (port = 4000) => {
   });
 };
 
-export { io, server, startServer };
+export { io, server, startServer, getReciverSocketId };
